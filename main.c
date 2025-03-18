@@ -6,14 +6,13 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 
-int main()
-{
+int main() {
 	int fbfd = 0;
 	struct fb_var_screeninfo vinfo;
 	struct fb_fix_screeninfo finfo;
 	long int screensize = 0;
 	char *fbp = 0;
-	int x = 0, y = 0;
+	unsigned int x = 0, y = 0;
 	long int location = 0;
 
 	// Open the file for reading and writing
@@ -42,8 +41,7 @@ int main()
 	screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
 
 	// Map the device to memory
-	fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED,
-										 fbfd, 0);
+	fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED,fbfd, 0);
 
 	// if mmap fails it returns a -1 pointer.
 	if (fbp == (char *) -1) {
@@ -53,30 +51,16 @@ int main()
 	printf("The framebuffer device was mapped to memory successfully.\n");
 
 	// Figure out where in memory to put the pixel
-	for (y = 100; y < 300; y++)
-		for (x = 200; x < 300; x++) {
-
-			location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-				(y+vinfo.yoffset) * finfo.line_length;
-
-			if (vinfo.bits_per_pixel == 32) {
-				*(fbp + location) = 100;        // Some blue
-				*(fbp + location + 1) = 15+(x-100)/2;     // A little green
-				*(fbp + location + 2) = 200-(y-100)/5;    // A lot of red
-				*(fbp + location + 3) = 0;      // No transparency
-			} else  { //assume 16bpp
-				printf("i got 16bpp\n");
-				int b = 10;
-				int g = (x-100)/6;     // A little green
-				int r = 31-(y-100)/16;    // A lot of red
-				unsigned short int t = r<<11 | g << 5 | b;
-				*((unsigned short int*)(fbp + location)) = t;
-			}
-
+	for (y = 0; y < vinfo.yres / 2; y++) {
+		for (x = 0; x < vinfo.xres /2; x++) {
+			location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) + (y+vinfo.yoffset) * finfo.line_length;
+			*(fbp + location) = 100;        // Some blue
+			*(fbp + location + 1) = 15+(x-100)/2;     // A little green
+			*(fbp + location + 2) = 200-(y-100)/5;    // A lot of red
+			*(fbp + location + 3) = 0;      // No transparency
 		}
-
+	}
 	munmap(fbp, screensize);
 	close(fbfd);
-	return 0;
 	return 0;
 }
