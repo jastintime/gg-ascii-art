@@ -6,6 +6,7 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 
+
 int main() {
 	int fbfd = 0;
 	struct fb_var_screeninfo vinfo;
@@ -41,10 +42,9 @@ int main() {
 	screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
 
 	// Map the device to memory
-	fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED,fbfd, 0);
+	fbp = mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED,fbfd, 0);
 
-	// if mmap fails it returns a -1 pointer.
-	if (fbp == (char *) -1) {
+	if (fbp == MAP_FAILED) {
 		perror("Error: failed to map framebuffer device to memory");
 		exit(4);
 	}
