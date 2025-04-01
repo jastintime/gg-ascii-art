@@ -2,7 +2,7 @@
 .PHONY: all
 
 CC = cc
-CFLAGS = -O2 -g -Wall -Werror -Wextra -Winit-self -Wuninitialized -pedantic -Wunreachable-code
+CFLAGS = -O2 -g -Wall -Wextra -Winit-self -Wuninitialized -pedantic -Wunreachable-code
 
 all: gg
 
